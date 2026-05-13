@@ -1,0 +1,87 @@
+
+<div id="ot" style="font-family:Arial,sans-serif;max-width:860px;margin:0 auto;padding:20px 0"></div><script>
+(function(){
+var PALK=14000,KATE=4;
+var M=[
+  {k:"Jaanuar",g:5000,a:3777,l:1},{k:"Veebruar",g:5000,a:4885,l:1},
+  {k:"Märts",g:3500,a:2813,l:1},{k:"Aprill",g:3500,a:3366,l:1},
+  {k:"Mai",g:4000,a:null,l:0},{k:"Juuni",g:4000,a:null,l:0},
+  {k:"Juuli",g:3800,a:null,l:0},{k:"August",g:3800,a:null,l:0},
+  {k:"September",g:4200,a:null,l:0},{k:"Oktoober",g:4500,a:null,l:0},
+  {k:"November",g:4500,a:null,l:0},{k:"Detsember",g:4000,a:null,l:0}
+];
+var s='<style>#ot h2{font-size:20px;font-weight:700;color:#1A5276;margin:0 0 4px}#ot p.sub{font-size:12px;color:#888;margin:0 0 16px}'+
+'.kp{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}'+
+'.kb{flex:1;min-width:140px;background:#f7f9fc;border:1px solid #e0e8f0;border-radius:10px;padding:12px 14px}'+
+'.kl{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}'+
+'.kv{font-size:20px;font-weight:700;color:#1A5276}.kv.g{color:#1E8449}.kv.r{color:#C0392B}'+
+'.oc{border-radius:12px;border:1px solid #ddd;overflow:hidden}'+
+'.oh{background:#1A5276;color:#fff;padding:10px 14px;font-size:12px;font-weight:700;letter-spacing:.04em}'+
+'table.ot{width:100%;border-collapse:collapse;font-size:13px}'+
+'table.ot th{background:#eaf0f6;color:#555;font-size:11px;font-weight:700;padding:9px 11px;text-align:left;border-bottom:1px solid #ddd;text-transform:uppercase}'+
+'table.ot td{padding:9px 11px;border-bottom:1px solid #f0f0f0;vertical-align:middle}'+
+'table.ot tr:last-child td{border-bottom:none}'+
+'table.ot tr.sc td{background:#f7f9fc;color:#aaa;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:6px 11px}'+
+'table.ot tr.gr td{background:#f0f6ff}'+
+'.bd{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}'+
+'.ba{background:#D5F5E3;color:#1E8449}.bg{background:#D6EAF8;color:#1F618D}'+
+'.rp{background:#D5F5E3;color:#1a6b38;font-weight:700;border-radius:6px;padding:2px 9px;display:inline-block;font-size:12px}'+
+'.rn{background:#FADBD8;color:#922B21;font-weight:700;border-radius:6px;padding:2px 9px;display:inline-block;font-size:12px}'+
+'.rz{background:#eee;color:#666;font-weight:700;border-radius:6px;padding:2px 9px;display:inline-block;font-size:12px}'+
+'.bw{display:flex;align-items:center;gap:5px}.bb{flex:1;height:7px;background:#eee;border-radius:4px;overflow:hidden;min-width:36px}'+
+'.bf{height:100%;border-radius:4px}'+
+'table.ot input{width:82px;padding:4px 7px;font-size:13px;border-radius:7px;border:1px solid #ccc;text-align:right;background:#fffde7;color:#222}'+
+'.on{font-size:11px;color:#bbb;padding:8px 14px;border-top:1px dashed #eee}</style>';
+document.getElementById('ot').innerHTML=s+
+'<h2>&#127795; Ostumeeskonna tracker 2025</h2>'+
+'<p class="sub">Sisesta tegelikud mahud kollastesse lahtritesse &mdash; tulemus arvutatakse kohe</p>'+
+'<div class="kp" id="okp"></div>'+
+'<div class="oc"><div class="oh">&#128197; TULEMUSLIKKUS JA EESM&Auml;RGID 2025</div>'+
+'<table class="ot"><thead><tr><th>Kuu</th><th></th><th>Eesm&auml;rk</th><th>Tegelik</th><th>T&auml;itmine</th><th>Tulemus</th></tr></thead>'+
+'<tbody id="otb"></tbody></table>'+
+'<div class="on">&#9878;&#65039; Nullpunkt = 3 500 tm/kuus (14 000 &euro; &divide; 4 &euro;/tm)</div></div>';
+
+function f(n){return n.toLocaleString('et-EE');}
+function fe(n){return(n>=0?'+':'')+n.toLocaleString('et-EE')+' \u20ac';}
+function fp(p){return Math.round(p*100)+'%';}
+
+function render(){
+  var tb=document.getElementById('otb');
+  tb.innerHTML='';
+  var bK=null,bP=-1,aT=0,aG=0,aN=0;
+  M.forEach(function(m){if(m.a!==null){aT+=m.a;aG+=m.g;aN++;}});
+  M.forEach(function(m,i){
+    if(i===0){var r=tb.insertRow();r.className='sc';r.innerHTML='<td colspan="6">Tegelikud tulemused (jaanuar &ndash; aprill)</td>';}
+    if(i===4){var r=tb.insertRow();r.className='sc';r.innerHTML='<td colspan="6">Eesm&auml;rgid (mai &ndash; detsember)</td>';}
+    var isA=m.a!==null,val=isA?m.a:m.g,pct=val/m.g,res=val*KATE-PALK;
+    if(isA&&pct>bP){bP=pct;bK=m.k;}
+    var bc=pct>=1?'#1E8449':pct>=0.85?'#D4AC0D':'#C0392B';
+    var bw=Math.min(100,Math.round(pct*100));
+    var rc=res>=0?'rp':isA?'rn':'rz';
+    var r=tb.insertRow();
+    if(!isA)r.className='gr';
+    r.innerHTML='<td><strong>'+m.k+'</strong></td>'+
+      '<td><span class="bd '+(isA?'ba':'bg')+'">'+(isA?'tegelik':'eesk.')+'</span></td>'+
+      '<td style="color:#bbb">'+f(m.g)+' tm</td>'+
+      '<td>'+(isA?'<strong>'+f(m.a)+' tm</strong>':'<input type="number" min="0" max="9999" step="1" placeholder="'+m.g+'" data-i="'+i+'">')+'</td>'+
+      '<td><div class="bw"><div class="bb"><div class="bf" style="width:'+bw+'%;background:'+bc+'"></div></div>'+
+      '<span style="font-size:12px;color:'+bc+';font-weight:700;min-width:32px">'+fp(pct)+'</span></div></td>'+
+      '<td><span class="'+rc+'">'+fe(res)+'</span></td>';
+  });
+  tb.querySelectorAll('input').forEach(function(inp){
+    inp.addEventListener('input',function(){
+      var i=parseInt(inp.dataset.i),v=parseInt(inp.value);
+      M[i].a=(inp.value===''||isNaN(v))?null:v;render();
+    });
+  });
+  var aR=M.reduce(function(s,m){return s+(m.a!==null?m.a:m.g)*KATE-PALK;},0);
+  var ap=aN>0?aT/aG:null;
+  document.getElementById('okp').innerHTML=
+    '<div class="kb"><div class="kl">Nullpunkt</div><div class="kv">3 500 tm</div></div>'+
+    '<div class="kb"><div class="kl">T&auml;itmine jan&ndash;apr</div><div class="kv '+(ap>=1?'g':'r')+'">'+(ap?fp(ap):'&mdash;')+'</div></div>'+
+    '<div class="kb"><div class="kl">Parim kuu</div><div class="kv" style="font-size:16px">'+(bK||'&mdash;')+'</div></div>'+
+    '<div class="kb"><div class="kl">Aasta tulemus</div><div class="kv '+(aR>=0?'g':'r')+'" style="font-size:16px">'+fe(aR)+'</div></div>';
+}
+render();
+})();
+</script>
